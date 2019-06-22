@@ -1,0 +1,23 @@
+{
+  "name": "@blockware/sdk-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockwarecom/sdk-nodejs-server.git"
+  },
+  "keywords": [
+    "blockware"
+  ],
+  "author": "Henrik Hofmeister <hh@blockware.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/blockwarecom/sdk-nodejs-server/issues"
+  },
+  "homepage": "https://github.com/blockwarecom/sdk-nodejs-server#readme",
+  "dependencies": {
+    "@blockware/sdk-config": "0.0.1",
+    "express": "4.17.1"
+  }
+}
