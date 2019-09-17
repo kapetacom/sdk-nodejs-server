@@ -1,6 +1,6 @@
 {
   "name": "@blockware/sdk-server",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/blockwarecom/sdk-nodejs-server#readme",
   "dependencies": {
-    "@blockware/sdk-config": "0.0.1",
+    "@blockware/sdk-config": "0.0.3",
+    "body-parser": "1.19.0",
     "express": "4.17.1"
   }
 }

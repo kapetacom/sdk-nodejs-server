@@ -11,6 +11,12 @@ interface Route {
 interface ConfigProvider {
 
     /**
+     * Gets a unique identifier for this config provider
+     * @return {string}
+     */
+    getProviderId();
+
+    /**
      * Gets the primary server port for this service
      * @return {Promise<number>}
      */

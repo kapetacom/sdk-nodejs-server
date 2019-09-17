@@ -1,13 +1,20 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const Config = require('@blockware/sdk-config');
+
 
 class Server {
 
-    constructor(serviceName) {
+    constructor(serviceName, blockPath) {
         /**
          * Name of this service
          */
         this._serviceName = serviceName;
+
+        /**
+         * Absolute path to the folder that contains the Block YML file for this service.
+         */
+        this._blockPath = blockPath;
 
         /**
          * Routes added to server
@@ -29,7 +36,6 @@ class Server {
          * @private
          */
         this._express = express();
-
     }
 
     /**
@@ -56,10 +62,29 @@ class Server {
      *
      * @return {Promise<void>}
      */
-    async start() {
-        this._config = await Config.init(this._serviceName);
+    start() {
+        console.log('Starting server for service: %s', this._serviceName);
+        this._start().catch((err) => {
+            if (err.stack) {
+                console.log(err.stack);
+            } else {
+                console.log('Failed to start: %s', err);
+            }
+        })
+    }
 
-        this._serverPort = await this._config.getServerPort();
+    async _start() {
+        try {
+            this._config = await Config.init(this._blockPath);
+            this._serverPort = await this._config.getServerPort();
+        } catch(err) {
+            if (err.message &&
+                err.message.indexOf('ECONN') > -1) {
+                throw new Error('Failed while connecting to cluster server at ' + this._config.getProviderId() + ': ' + err.message);
+            }
+
+            throw err;
+        }
 
         console.log('Starting server on port %s', this._serverPort);
 
