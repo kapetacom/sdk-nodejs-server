@@ -1,7 +1,7 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const Config = require('@blockware/sdk-config');
 
+const HEALTH_ENDPOINT = '/__blockware/health';
 
 class Server {
 
@@ -73,9 +73,15 @@ class Server {
         })
     }
 
+    _configureHealthCheck() {
+        this._express.get(HEALTH_ENDPOINT, (req, res) => {
+            res.status(200).send({ok:true});
+        });
+    }
+
     async _start() {
         try {
-            this._config = await Config.init(this._blockPath);
+            this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT);
             this._serverPort = await this._config.getServerPort();
         } catch(err) {
             if (err.message &&
@@ -85,6 +91,8 @@ class Server {
 
             throw err;
         }
+
+        this._configureHealthCheck();
 
         console.log('Starting server on port %s', this._serverPort);
 
