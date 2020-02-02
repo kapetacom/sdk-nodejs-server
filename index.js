@@ -18,7 +18,7 @@ class Server {
 
         /**
          * Routes added to server
-         * @type {RESTRoute[]}
+         * @type {Route[]}
          * @private
          */
         this._routes = [];
@@ -48,10 +48,10 @@ class Server {
     }
 
     /**
-     * Add REST endpoint to server
-     * @param {RESTRoute} route
+     * Add Route to server
+     * @param {Route} route
      */
-    addRESTRoute(route) {
+    addRoute(route) {
         this._routes.push(route);
 
         this._express.use(route.toExpressRoute());
@@ -60,11 +60,12 @@ class Server {
     /**
      * Starts server
      *
+     * @param [portType {string}] the type of port to listen on. Defaults to "rest"
      * @return {Promise<void>}
      */
-    start() {
+    start(portType) {
         console.log('Starting server for service: %s', this._serviceName);
-        this._start().catch((err) => {
+        this._start(portType).catch((err) => {
             if (err.stack) {
                 console.log(err.stack);
             } else {
@@ -79,10 +80,16 @@ class Server {
         });
     }
 
-    async _start() {
+    /**
+     *
+     * @param [portType {string}] the type of port to listen on. Defaults to "rest"
+     * @return {Promise<void>}
+     * @private
+     */
+    async _start(portType) {
         try {
             this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT);
-            this._serverPort = await this._config.getServerPort();
+            this._serverPort = await this._config.getServerPort(portType);
         } catch(err) {
             if (err.message &&
                 err.message.indexOf('ECONN') > -1) {

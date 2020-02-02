@@ -1,12 +1,8 @@
-interface RESTRoute extends Route {
+import express from 'express';
 
+export declare class Route {
+    toExpressRoute(): express.Router;
 }
-
-interface Route {
-    toExpressRoute();
-}
-
-
 
 interface ConfigProvider {
 
