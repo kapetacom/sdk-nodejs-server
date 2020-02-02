@@ -18,10 +18,13 @@
   "homepage": "https://github.com/blockwarecom/sdk-nodejs-server#readme",
   "dependencies": {
     "body-parser": "1.19.0",
-    "express": "4.17.1",
-    "@blockware/sdk-config": "0.0.4"
+    "express": "4.17.1"
+  },
+  "peerDependencies": {
+    "@blockware/sdk-config": "^0.0.4"
   },
   "devDependencies": {
-    "@types/express": "^4.17.2"
+    "@types/express": "^4.17.2",
+    "@blockware/sdk-config": "^0.0.4"
   }
 }
