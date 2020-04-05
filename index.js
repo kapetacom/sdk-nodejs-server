@@ -93,9 +93,12 @@ class Server {
         } catch(err) {
 
             if (err.message &&
-                err.message.indexOf('ECONN') > -1 &&
-                this._config) {
-                throw new Error('Failed while connecting to cluster server at ' + this._config.getProviderId() + ': ' + err.message);
+                err.message.indexOf('ECONN') > -1) {
+                if (this._config) {
+                    throw new Error('Failed while connecting to cluster server at ' + this._config.getProviderId() + ': ' + err.message);
+                }
+
+                throw new Error('Failed while connecting to cluster server: ' + err.message);
             }
 
             throw err;
