@@ -91,8 +91,10 @@ class Server {
             this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT);
             this._serverPort = await this._config.getServerPort(portType);
         } catch(err) {
+
             if (err.message &&
-                err.message.indexOf('ECONN') > -1) {
+                err.message.indexOf('ECONN') > -1 &&
+                this._config) {
                 throw new Error('Failed while connecting to cluster server at ' + this._config.getProviderId() + ': ' + err.message);
             }
 
