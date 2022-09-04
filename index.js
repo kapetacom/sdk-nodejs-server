@@ -90,6 +90,7 @@ class Server {
         try {
             this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT);
             this._serverPort = await this._config.getServerPort(portType);
+            this._serverHost = await this._config.getServerHost();
         } catch(err) {
 
             if (err.message &&
@@ -106,16 +107,16 @@ class Server {
 
         this._configureHealthCheck();
 
-        console.log('Starting server on port %s', this._serverPort);
+        console.log('Starting server on %s:%s', this._serverHost, this._serverPort);
 
         return new Promise((resolve, reject) => {
-            this._express.listen(this._serverPort, (err) => {
+            this._express.listen(this._serverPort, this._serverHost, (err) => {
                 if (err) {
                     reject(err);
                     return;
                 }
 
-                console.log('Server listening on port %s', this._serverPort);
+                console.log('Server listening on %s:%s', this._serverHost, this._serverPort);
                 resolve();
             });
         });
