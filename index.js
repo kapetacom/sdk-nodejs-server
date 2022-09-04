@@ -66,7 +66,7 @@ class Server {
     start(portType) {
         console.log('Starting server for service: %s', this._serviceName);
         this._start(portType).catch((err) => {
-            if (err.stack) {
+            if (err.stack) {
                 console.log(err.stack);
             } else {
                 console.log('Failed to start: %s', err);
