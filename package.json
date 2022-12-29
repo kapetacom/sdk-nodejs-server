@@ -1,9 +1,8 @@
 {
   "name": "@blockware/sdk-server",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "index.js",
-  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockwarecom/sdk-nodejs-server.git"
