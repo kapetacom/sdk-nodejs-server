@@ -88,7 +88,7 @@ class Server {
      */
     async _start(portType) {
         try {
-            this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT);
+            this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT, portType);
             this._serverPort = await this._config.getServerPort(portType);
             this._serverHost = await this._config.getServerHost();
         } catch(err) {
