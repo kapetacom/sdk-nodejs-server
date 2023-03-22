@@ -1,7 +1,7 @@
 const express = require('express');
-const Config = require('@blockware/sdk-config');
+const Config = require('@kapeta/sdk-config');
 
-const HEALTH_ENDPOINT = '/__blockware/health';
+const HEALTH_ENDPOINT = '/__kapeta/health';
 
 class Server {
 
