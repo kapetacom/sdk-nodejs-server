@@ -36,6 +36,9 @@ class Server {
          * @private
          */
         this._express = express();
+
+        //Configure health endpoint as first route
+        this._configureHealthCheck();
     }
 
     /**
@@ -92,7 +95,6 @@ class Server {
             this._serverPort = await this._config.getServerPort(portType);
             this._serverHost = await this._config.getServerHost();
         } catch(err) {
-
             if (err.message &&
                 err.message.indexOf('ECONN') > -1) {
                 if (this._config) {
@@ -104,8 +106,6 @@ class Server {
 
             throw err;
         }
-
-        this._configureHealthCheck();
 
         console.log('Starting server on %s:%s', this._serverHost, this._serverPort);
 
