@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.0.0...v1.0.1) (2023-06-09)
+
+
+### Bug Fixes
+
+* Support mixed modules ([1a56d5f](https://github.com/kapetacom/sdk-nodejs-server/commit/1a56d5fd09945fb53ebb4c5384cf7280ea56305f))
+
 # 1.0.0 (2023-06-09)
 
 
