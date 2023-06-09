@@ -2,7 +2,6 @@ import { ConfigProvider } from '@kapeta/sdk-config';
 import express, { Express, Router } from 'express';
 
 import Config from '@kapeta/sdk-config';
-import { ApplicationRequestHandler, IRouterHandler, PathParams } from 'express-serve-static-core';
 
 const HEALTH_ENDPOINT = '/__kapeta/health';
 
@@ -98,7 +97,7 @@ export class Server {
     async _start(portType: string) {
         try {
             this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT, portType);
-            this._serverPort = await this._config.getServerPort(portType);
+            this._serverPort = parseInt(await this._config.getServerPort(portType));
             this._serverHost = await this._config.getServerHost();
         } catch (err: any) {
             if (err.message && err.message.indexOf('ECONN') > -1) {
