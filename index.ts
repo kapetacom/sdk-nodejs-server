@@ -1,11 +1,23 @@
-const express = require('express');
-const Config = require('@kapeta/sdk-config');
+import { ConfigProvider } from '@kapeta/sdk-config';
+import express, { Express, Router } from 'express';
+
+import Config from '@kapeta/sdk-config';
 
 const HEALTH_ENDPOINT = '/__kapeta/health';
 
-class Server {
+export interface Route {
+    toExpressRoute(): Router;
+}
+export class Server {
+    private readonly _serviceName: string;
+    private readonly _blockPath: string;
+    private readonly _express: Express;
+    private _routes: Route[];
+    private _config?: ConfigProvider;
+    private _serverPort?: number;
+    private _serverHost?: string;
 
-    constructor(serviceName, blockPath) {
+    constructor(serviceName: string, blockPath: string) {
         /**
          * Name of this service
          */
@@ -22,13 +34,6 @@ class Server {
          * @private
          */
         this._routes = [];
-
-        /**
-         * Config provider
-         * @type {ConfigProvider}
-         * @private
-         */
-        this._config = null;
 
         /**
          * Underlying express app
@@ -54,7 +59,7 @@ class Server {
      * Add Route to server
      * @param {Route} route
      */
-    addRoute(route) {
+    addRoute(route: Route) {
         this._routes.push(route);
 
         this._express.use(route.toExpressRoute());
@@ -66,7 +71,7 @@ class Server {
      * @param [portType {string}] the type of port to listen on. Defaults to "rest"
      * @return {Promise<void>}
      */
-    start(portType) {
+    start(portType: string) {
         console.log('Starting server for service: %s', this._serviceName);
         this._start(portType).catch((err) => {
             if (err.stack) {
@@ -74,12 +79,12 @@ class Server {
             } else {
                 console.log('Failed to start: %s', err);
             }
-        })
+        });
     }
 
     _configureHealthCheck() {
         this._express.get(HEALTH_ENDPOINT, (req, res) => {
-            res.status(200).send({ok:true});
+            res.status(200).send({ ok: true });
         });
     }
 
@@ -89,16 +94,20 @@ class Server {
      * @return {Promise<void>}
      * @private
      */
-    async _start(portType) {
+    async _start(portType: string) {
         try {
             this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT, portType);
-            this._serverPort = await this._config.getServerPort(portType);
+            this._serverPort = parseInt(await this._config.getServerPort(portType));
             this._serverHost = await this._config.getServerHost();
-        } catch(err) {
-            if (err.message &&
-                err.message.indexOf('ECONN') > -1) {
+        } catch (err: any) {
+            if (err.message && err.message.indexOf('ECONN') > -1) {
                 if (this._config) {
-                    throw new Error('Failed while connecting to cluster server at ' + this._config.getProviderId() + ': ' + err.message);
+                    throw new Error(
+                        'Failed while connecting to cluster server at ' +
+                            this._config.getProviderId() +
+                            ': ' +
+                            err.message
+                    );
                 }
 
                 throw new Error('Failed while connecting to cluster server: ' + err.message);
@@ -109,19 +118,11 @@ class Server {
 
         console.log('Starting server on %s:%s', this._serverHost, this._serverPort);
 
-        return new Promise((resolve, reject) => {
-            this._express.listen(this._serverPort, this._serverHost, (err) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
+        return new Promise((resolve) => {
+            this._express.listen(this._serverPort!, this._serverHost!, () => {
                 console.log('Server listening on %s:%s', this._serverHost, this._serverPort);
-                resolve();
+                resolve(null);
             });
         });
     }
 }
-
-
-module.exports = Server;
