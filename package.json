@@ -23,7 +23,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/kapeta/sdk-nodejs-server.git"
+        "url": "git+https://github.com/kapetacom/sdk-nodejs-server.git"
     },
     "keywords": [
         "kapeta"
