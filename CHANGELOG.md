@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.0.1...v1.0.2) (2023-06-11)
+
+
+### Bug Fixes
+
+* Default to commonjs ([ffd9cb7](https://github.com/kapetacom/sdk-nodejs-server/commit/ffd9cb75be94e980f2a86ec39de36036aaa809db))
+
 ## [1.0.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.0.0...v1.0.1) (2023-06-09)
 
 
