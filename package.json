@@ -2,7 +2,7 @@
     "name": "@kapeta/sdk-server",
     "version": "1.0.1",
     "description": "Express server for Kapeta SDK",
-    "type": "module",
+    "type": "commonjs",
     "exports": {
         ".": {
             "import": {
