@@ -2,6 +2,7 @@ import { ConfigProvider } from '@kapeta/sdk-config';
 import express, { Express, Router } from 'express';
 
 import Config from '@kapeta/sdk-config';
+import {applyWebpackHandlers} from "./src/webpack";
 
 const HEALTH_ENDPOINT = '/__kapeta/health';
 
@@ -65,6 +66,10 @@ export class Server {
         this._express.use(route.toExpressRoute());
     }
 
+    configureAssets(distFolder:string, webpackConfig:any) {
+        applyWebpackHandlers(distFolder, webpackConfig, this._express);
+    }
+
     /**
      * Starts server
      *
@@ -73,6 +78,7 @@ export class Server {
      */
     start(portType: string) {
         console.log('Starting server for service: %s', this._serviceName);
+        this._configureCatchAll();
         this._start(portType).catch((err) => {
             if (err.stack) {
                 console.log(err.stack);
@@ -80,6 +86,12 @@ export class Server {
                 console.log('Failed to start: %s', err);
             }
         });
+    }
+
+    _configureCatchAll() {
+        this._express.use((req, res) => {
+            res.status(400).send({error: "Not available"});
+        })
     }
 
     _configureHealthCheck() {
