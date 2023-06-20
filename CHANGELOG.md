@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.0.2...v1.1.0) (2023-06-20)
+
+
+### Features
+
+* Adds dynamic server side rendering of html page ([#3](https://github.com/kapetacom/sdk-nodejs-server/issues/3)) ([47fb4ee](https://github.com/kapetacom/sdk-nodejs-server/commit/47fb4ee5eb22c7d8a087d3a011455eba3d26639e))
+
 ## [1.0.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.0.1...v1.0.2) (2023-06-11)
 
 
