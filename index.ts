@@ -1,8 +1,8 @@
 import { ConfigProvider } from '@kapeta/sdk-config';
-import express, { Express, Router } from 'express';
-
+import express, { Express, Request, Response, Router } from 'express';
+import compression from 'compression';
 import Config from '@kapeta/sdk-config';
-import {applyWebpackHandlers} from "./src/webpack";
+import { applyWebpackHandlers } from './src/webpack';
 
 const HEALTH_ENDPOINT = '/__kapeta/health';
 
@@ -45,6 +45,9 @@ export class Server {
 
         //Configure health endpoint as first route
         this._configureHealthCheck();
+
+        //Configure compression
+        this._configureCompression();
     }
 
     /**
@@ -66,7 +69,7 @@ export class Server {
         this._express.use(route.toExpressRoute());
     }
 
-    configureAssets(distFolder:string, webpackConfig:any) {
+    configureAssets(distFolder: string, webpackConfig: any) {
         applyWebpackHandlers(distFolder, webpackConfig, this._express);
     }
 
@@ -90,8 +93,8 @@ export class Server {
 
     _configureCatchAll() {
         this._express.use((req, res) => {
-            res.status(400).send({error: "Not available"});
-        })
+            res.status(400).send({ error: 'Not available' });
+        });
     }
 
     _configureHealthCheck() {
@@ -136,5 +139,19 @@ export class Server {
                 resolve(null);
             });
         });
+    }
+
+    private _configureCompression() {
+        function shouldCompress(req: Request, res: Response) {
+            if (req.headers['x-no-compression']) {
+                // Don't compress responses with this request header
+                return false;
+            }
+
+            // Fallback to standard filter function
+            return compression.filter(req, res);
+        }
+
+        this._express.use(compression({ filter: shouldCompress }));
     }
 }
