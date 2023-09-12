@@ -1,6 +1,6 @@
 {
     "name": "@kapeta/sdk-server",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Express server for Kapeta SDK",
     "type": "commonjs",
     "exports": {

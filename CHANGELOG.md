@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.1.0...v1.2.0) (2023-09-12)
+
+
+### Features
+
+* Add compression ([958f484](https://github.com/kapetacom/sdk-nodejs-server/commit/958f48405915a9bf711765a9503fe6dcf09101cb))
+
 # [1.1.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.0.2...v1.1.0) (2023-06-20)
 
 
