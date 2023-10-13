@@ -1,5 +1,6 @@
 import { ConfigProvider } from '@kapeta/sdk-config';
-import express, { Express, Router } from 'express';
+import express, { Express, Request, Response, Router } from 'express';
+import compression from 'compression';
 import Config from '@kapeta/sdk-config';
 import { applyWebpackHandlers } from './src/webpack';
 
@@ -44,6 +45,9 @@ export class Server {
 
         //Configure health endpoint as first route
         this._configureHealthCheck();
+
+        //Configure compression
+        this._configureCompression();
     }
 
     /**
@@ -135,5 +139,19 @@ export class Server {
                 resolve(null);
             });
         });
+    }
+
+    private _configureCompression() {
+        function shouldCompress(req: Request, res: Response) {
+            if (req.headers['x-no-compression']) {
+                // Don't compress responses with this request header
+                return false;
+            }
+
+            // Fallback to standard filter function
+            return compression.filter(req, res);
+        }
+
+        this._express.use(compression({ filter: shouldCompress }));
     }
 }
