@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.2.0...v1.3.0) (2023-10-13)
+
+
+### Features
+
+* Remove compression middleware ([8ae7f42](https://github.com/kapetacom/sdk-nodejs-server/commit/8ae7f42e77a3e930026cde81e67b1662591c2545))
+
 # [1.2.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.1.0...v1.2.0) (2023-09-12)
 
 
