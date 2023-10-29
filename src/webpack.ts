@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
 import express, {Express} from "express";
 import FS from "fs";
 import * as Path from "path";
