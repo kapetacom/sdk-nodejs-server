@@ -4,51 +4,51 @@
  */
 
 import { ConfigProvider } from '@kapeta/sdk-config';
-import express, { Express, Router } from 'express';
-import Config from '@kapeta/sdk-config';
+import express, {Express, RequestHandler, Router} from 'express';
 import { applyWebpackHandlers } from './src/webpack';
+const HEALTH_ENDPOINT = '/.kapeta/health';
 
-const HEALTH_ENDPOINT = '/__kapeta/health';
+export * from './src/helpers';
 
-export interface Route {
-    toExpressRoute(): Router;
+export type ServerOptions = {
+    disableErrorHandling?: boolean;
+    disableCatchAll?: boolean;
+    disableHealthCheck?: boolean;
 }
+
+//We want dates as numbers
+const JSONStringifyReplacer = function (this: any, key: string, value: any) {
+    if (this[key] instanceof Date) {
+        return this[key].getTime();
+    }
+    return value;
+}
+
+export type ServerPortType = 'rest'|'web'|'http';
+
 export class Server {
-    private readonly _serviceName: string;
-    private readonly _blockPath: string;
+
+    /**
+     * Underlying express app
+     */
     private readonly _express: Express;
-    private _routes: Route[];
-    private _config?: ConfigProvider;
+    private readonly _options: ServerOptions;
+    private readonly _config: ConfigProvider;
     private _serverPort?: number;
     private _serverHost?: string;
 
-    constructor(serviceName: string, blockPath: string) {
-        /**
-         * Name of this service
-         */
-        this._serviceName = serviceName;
-
-        /**
-         * Absolute path to the folder that contains the Block YML file for this service.
-         */
-        this._blockPath = blockPath;
-
-        /**
-         * Routes added to server
-         * @type {Route[]}
-         * @private
-         */
-        this._routes = [];
-
-        /**
-         * Underlying express app
-         * @type {express}
-         * @private
-         */
+    constructor(config: ConfigProvider, options: ServerOptions = {}) {
+        this._config = config;
         this._express = express();
+        this._options = options;
 
         //Configure health endpoint as first route
-        this._configureHealthCheck();
+        if (!this._options?.disableHealthCheck) {
+            this._configureHealthCheck();
+        }
+
+        this._express.set('json replacer', JSONStringifyReplacer);
+
     }
 
     /**
@@ -56,33 +56,23 @@ export class Server {
      *
      * @return {express}
      */
-    express() {
+    public express() {
         return this._express;
     }
 
-    /**
-     * Add Route to server
-     * @param {Route} route
-     */
-    addRoute(route: Route) {
-        this._routes.push(route);
-
-        this._express.use(route.toExpressRoute());
+    public use(...handlers: RequestHandler[]) {
+        this._express.use(...handlers);
     }
 
-    configureAssets(distFolder: string, webpackConfig: any) {
+    public configureAssets(distFolder: string, webpackConfig: any) {
         applyWebpackHandlers(distFolder, webpackConfig, this._express);
     }
 
     /**
      * Starts server
-     *
-     * @param [portType {string}] the type of port to listen on. Defaults to "rest"
-     * @return {Promise<void>}
      */
-    start(portType: string) {
-        console.log('Starting server for service: %s', this._serviceName);
-        this._configureCatchAll();
+    public start(portType: ServerPortType) {
+        console.log('Starting server for service: %s', this._config.getBlockReference());
         this._start(portType).catch((err) => {
             if (err.stack) {
                 console.log(err.stack);
@@ -92,27 +82,34 @@ export class Server {
         });
     }
 
-    _configureCatchAll() {
-        this._express.use((req, res) => {
-            res.status(400).send({ error: 'Not available' });
+    private _configureErrorHandler() {
+        this._express.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            const errorBody = err.message ? { error: err.message } : { error: 'Unknown error' };
+            if (err.statusCode) {
+                res.status(err.statusCode).json(errorBody);
+                return;
+            }
+
+            res.status(500).json(errorBody);
         });
     }
 
-    _configureHealthCheck() {
+    private _configureCatchAll() {
+        this._express.use((req, res) => {
+            res.status(418).send({ error: 'Not available' });
+        });
+    }
+
+    private _configureHealthCheck() {
+        console.log('Configuring health check endpoint: %s', HEALTH_ENDPOINT);
         this._express.get(HEALTH_ENDPOINT, (req, res) => {
             res.status(200).send({ ok: true });
         });
     }
 
-    /**
-     *
-     * @param [portType {string}] the type of port to listen on. Defaults to "rest"
-     * @return {Promise<void>}
-     * @private
-     */
-    async _start(portType: string) {
+    private async _start(portType: ServerPortType) {
         try {
-            this._config = await Config.init(this._blockPath, HEALTH_ENDPOINT, portType);
+
             this._serverPort = parseInt(await this._config.getServerPort(portType));
             this._serverHost = await this._config.getServerHost();
         } catch (err: any) {
@@ -130,6 +127,14 @@ export class Server {
             }
 
             throw err;
+        }
+
+        if (!this._options?.disableErrorHandling) {
+            this._configureErrorHandler();
+        }
+
+        if (!this._options?.disableCatchAll) {
+            this._configureCatchAll();
         }
 
         console.log('Starting server on %s:%s', this._serverHost, this._serverPort);
