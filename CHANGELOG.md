@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.3.0...v2.0.0) (2023-12-12)
+
+
+### Features
+
+* Simplify constructor and api ([#8](https://github.com/kapetacom/sdk-nodejs-server/issues/8)) ([8bc7c72](https://github.com/kapetacom/sdk-nodejs-server/commit/8bc7c72a315fea74200663feb93525e626e678e0))
+
+
+### BREAKING CHANGES
+
+* Refactored to be used like plain express
+
 # [1.3.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.2.0...v1.3.0) (2023-10-13)
 
 
