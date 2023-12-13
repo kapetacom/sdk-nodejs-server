@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.0.0...v2.0.1) (2023-12-13)
+
+
+### Bug Fixes
+
+* Adjust dependencies to match v2 ([ec453e2](https://github.com/kapetacom/sdk-nodejs-server/commit/ec453e2530e49384dbaa6a6c8df687671d6ec79e))
+
 # [2.0.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v1.3.0...v2.0.0) (2023-12-12)
 
 
