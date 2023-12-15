@@ -15,10 +15,13 @@ function normalizeAssets(assets: any) {
     return Array.isArray(assets) ? assets : [assets];
 }
 
-function allEntries(assetsByChunkName: any): any[] {
-    const out: any[] = [];
-    Object.values(assetsByChunkName).forEach(assets => {
-        out.push(...normalizeAssets(assets));
+function allEntries(assetsByChunkName: any): string[] {
+    const out: string[] = [];
+    Object.values(assetsByChunkName).forEach((assets) => {
+        const normalizedAssets = normalizeAssets(assets);
+        if (Array.isArray(normalizedAssets)) {
+            out.push(...normalizedAssets.filter((asset) => typeof asset === 'string'));
+        }
     });
     return out;
 }
