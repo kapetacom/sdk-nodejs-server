@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.0.1...v2.0.2) (2023-12-15)
+
+
+### Bug Fixes
+
+* Ensure allEntries returns string[] ([920ee33](https://github.com/kapetacom/sdk-nodejs-server/commit/920ee3387fe4c3b9aceb9306213123e7320ce511))
+* Fix file path in webpack.ts ([0e7972f](https://github.com/kapetacom/sdk-nodejs-server/commit/0e7972fa5e7e0b170ed0b40ba64fc52a542244c3))
+
 ## [2.0.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.0.0...v2.0.1) (2023-12-13)
 
 
