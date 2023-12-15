@@ -15,10 +15,13 @@ function normalizeAssets(assets: any) {
     return Array.isArray(assets) ? assets : [assets];
 }
 
-function allEntries(assetsByChunkName: any): any[] {
-    const out: any[] = [];
-    Object.values(assetsByChunkName).forEach(assets => {
-        out.push(...normalizeAssets(assets));
+function allEntries(assetsByChunkName: any): string[] {
+    const out: string[] = [];
+    Object.values(assetsByChunkName).forEach((assets) => {
+        const normalizedAssets = normalizeAssets(assets);
+        if (Array.isArray(normalizedAssets)) {
+            out.push(...normalizedAssets.filter((asset) => typeof asset === 'string'));
+        }
     });
     return out;
 }
@@ -70,7 +73,7 @@ export const applyWebpackHandlers = (distFolder: string, webpackConfig: any, app
                 head: `<style>
                             ${allEntries(assetsByChunkName)
                     .filter((path) => path.endsWith(".css") && !path.endsWith(".hot-update.css"))
-                    .map((path) => outputFileSystem.readFileSync(path.join(outputPath, path)))
+                    .map((path) => outputFileSystem.readFileSync(Path.join(outputPath, path)))
                     .join("\n")}
                             </style>`,
                 body: allEntries(assetsByChunkName)
