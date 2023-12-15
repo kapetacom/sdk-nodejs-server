@@ -73,7 +73,7 @@ export const applyWebpackHandlers = (distFolder: string, webpackConfig: any, app
                 head: `<style>
                             ${allEntries(assetsByChunkName)
                     .filter((path) => path.endsWith(".css") && !path.endsWith(".hot-update.css"))
-                    .map((path) => outputFileSystem.readFileSync(path.join(outputPath, path)))
+                    .map((path) => outputFileSystem.readFileSync(Path.join(outputPath, path)))
                     .join("\n")}
                             </style>`,
                 body: allEntries(assetsByChunkName)
