@@ -64,7 +64,7 @@ export const applyWebpackHandlers = (distFolder: string, devWebpackConfig: any, 
             const outputFileSystem = devMiddleware.outputFileSystem;
             const jsonWebpackStats = devMiddleware.stats.toJson();
             const {assetsByChunkName, outputPath} = jsonWebpackStats;
-            const baseUrl = req.query._kap_basepath ? req.query._kap_basepath : '/';
+            const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
 
             res.send(templates.renderMain({
                 baseUrl,
@@ -105,7 +105,7 @@ export const applyWebpackHandlers = (distFolder: string, devWebpackConfig: any, 
         app.use(express.static(distFolder));
 
         app.get('/*', (req, res) => {
-            const baseUrl = req.query._kap_basepath ? req.query._kap_basepath : '/';
+            const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
 
             res.send(templates.renderMain({
                 baseUrl,
