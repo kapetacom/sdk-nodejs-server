@@ -1,3 +1,11 @@
+## [2.1.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.1.0...v2.1.1) (2023-12-29)
+
+
+### Bug Fixes
+
+* Make baseUrl string ([215cf96](https://github.com/kapetacom/sdk-nodejs-server/commit/215cf96005a58e3a105e265bdd4c24c917acde8b))
+* Typo in template types ([bf614b9](https://github.com/kapetacom/sdk-nodejs-server/commit/bf614b9fe84385d2a490d990a3f388eb96aa6a8b))
+
 # [2.1.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.0.2...v2.1.0) (2023-12-29)
 
 
