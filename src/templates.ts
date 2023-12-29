@@ -1,4 +1,4 @@
-export type MainTemplateParams = { baseUrl: any, styles: string, scripts: string };
+export type MainTemplateParams = { baseUrl: string, styles: string, scripts: string };
 
 export interface Templates {
     /**
