@@ -6,9 +6,11 @@
 import { ConfigProvider } from '@kapeta/sdk-config';
 import express, {Express, RequestHandler, Router} from 'express';
 import { applyWebpackHandlers } from './src/webpack';
+import {TemplatesOverrides} from "./src/templates";
 const HEALTH_ENDPOINT = '/.kapeta/health';
 
 export * from './src/helpers';
+export * from './src/templates';
 
 export type ServerOptions = {
     disableErrorHandling?: boolean;
@@ -25,6 +27,11 @@ const JSONStringifyReplacer = function (this: any, key: string, value: any) {
 }
 
 export type ServerPortType = 'rest'|'web'|'http';
+
+export const isDevMode = () => {
+    return !!(process.env.NODE_ENV &&
+            process.env.NODE_ENV.toLowerCase() === "development");
+}
 
 export class Server {
 
@@ -64,8 +71,8 @@ export class Server {
         this._express.use(...handlers);
     }
 
-    public configureAssets(distFolder: string, webpackConfig: any) {
-        applyWebpackHandlers(distFolder, webpackConfig, this._express);
+    public configureAssets(distFolder: string, webpackConfig: any, templateOverrides?: TemplatesOverrides) {
+        applyWebpackHandlers(distFolder, webpackConfig, this._express, templateOverrides);
     }
 
     /**

@@ -5,7 +5,9 @@
 
 import express, {Express} from "express";
 import FS from "fs";
-import * as Path from "path";
+import * as Path from "node:path";
+import {asTemplates, TemplatesOverrides} from "./templates";
+import {isDevMode} from "../index";
 
 function normalizeAssets(assets: any) {
     if (!Array.isArray(assets)) {
@@ -26,30 +28,26 @@ function allEntries(assetsByChunkName: any): string[] {
     return out;
 }
 
-const renderHTMLPage = ({baseUrl, head, body}: { baseUrl: any, head: string, body: string }) => {
-    return `<html>
-              <head>
-                <meta charset="utf-8" />
-                <base href="${baseUrl}" />
-                ${head}
-              </head>
-              <body>
-                ${body}
-              </body>
-            </html>`
-}
+/**
+ * Applies webpack handlers to the express app.
+ * This is used to serve the frontend in dev mode and in prod mode.
+ * In dev mode, the webpack dev middleware is used to serve the frontend.
+ * In prod mode, the frontend is served from the dist folder.
+ *
+ * @param distFolder The absolute path to the dist folder where the build artifacts are located.
+ * @param devWebpackConfig The webpack config used in dev mode.
+ * @param app The express app to apply the handlers to.
+ * @param templateOverrides Optional overrides for the templates used when rendering the HTML page.
+ */
+export const applyWebpackHandlers = (distFolder: string, devWebpackConfig: any, app: Express, templateOverrides?:TemplatesOverrides) => {
+    const templates = asTemplates(templateOverrides || {});
 
-export const applyWebpackHandlers = (distFolder: string, webpackConfig: any, app: Express) => {
-    const devMode =
-        !!(process.env.NODE_ENV &&
-            process.env.NODE_ENV.toLowerCase() === "development");
-
-    if (devMode) {
+    if (isDevMode()) {
         /* eslint-disable */
         console.log("Serving development version");
         const webpack = require("webpack");
         const webpackDevMiddleware = require("webpack-dev-middleware");
-        const compiler = webpack(webpackConfig);
+        const compiler = webpack(devWebpackConfig);
 
         app.use(
             "/",
@@ -68,17 +66,17 @@ export const applyWebpackHandlers = (distFolder: string, webpackConfig: any, app
             const {assetsByChunkName, outputPath} = jsonWebpackStats;
             const baseUrl = req.query._kap_basepath ? req.query._kap_basepath : '/';
 
-            res.send(renderHTMLPage({
+            res.send(templates.renderMain({
                 baseUrl,
-                head: `<style>
-                            ${allEntries(assetsByChunkName)
+                styles: templates.renderInlineStyle(
+                    allEntries(assetsByChunkName)
                     .filter((path) => path.endsWith(".css") && !path.endsWith(".hot-update.css"))
                     .map((path) => outputFileSystem.readFileSync(Path.join(outputPath, path)))
-                    .join("\n")}
-                            </style>`,
-                body: allEntries(assetsByChunkName)
+                    .join("\n")
+                ),
+                scripts: allEntries(assetsByChunkName)
                     .filter((path) => path.endsWith(".js") && !path.endsWith(".hot-update.js"))
-                    .map((path) => `<script src="${path}"></script>`)
+                    .map((path) => templates.renderScript(path))
                     .join("\n")
             }));
         });
@@ -109,15 +107,15 @@ export const applyWebpackHandlers = (distFolder: string, webpackConfig: any, app
         app.get('/*', (req, res) => {
             const baseUrl = req.query._kap_basepath ? req.query._kap_basepath : '/';
 
-            res.send(renderHTMLPage({
+            res.send(templates.renderMain({
                 baseUrl,
-                head: allEntries(assets)
+                styles: allEntries(assets)
                     .filter((path) => path.endsWith(".css"))
-                    .map((path) => `<link rel="stylesheet" href="${path}" >`)
+                    .map((path) => templates.renderStylesheet(path))
                     .join("\n"),
-                body: allEntries(assets)
+                scripts: allEntries(assets)
                     .filter((path) => path.endsWith(".js") && !path.endsWith(".hot-update.js"))
-                    .map((path) => `<script src="${path}"></script>`)
+                    .map((path) => templates.renderScript(path))
                     .join("\n")
 
             }));
