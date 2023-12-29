@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.0.2...v2.1.0) (2023-12-29)
+
+
+### Features
+
+* Add template override argument to configureAssets ([#10](https://github.com/kapetacom/sdk-nodejs-server/issues/10)) ([df5751d](https://github.com/kapetacom/sdk-nodejs-server/commit/df5751d1c78679e8f5353bb0db937b25451d71b3))
+
 ## [2.0.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.0.1...v2.0.2) (2023-12-15)
 
 
