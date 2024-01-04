@@ -1,33 +1,34 @@
+import { Request } from 'express';
 export type MainTemplateParams = { baseUrl: string, styles: string, scripts: string };
 
-export interface Templates {
+export interface Templates<R extends Request = Request> {
     /**
      * Renders main html template. Receives params with baseUrl, styles and scripts.
      *
      * All of them should be rendered as-is, without any escaping for the renderer to work.
      */
-    renderMain(params: MainTemplateParams): string;
+    renderMain(req: R, params: MainTemplateParams): string;
 
     /**
      * Renders script link - used in both dev and prod mode
      */
-    renderScript(src: string): string;
+    renderScript(req: R, src: string): string;
 
     /**
      * Renders stylesheet link - only used in prod mode
      */
-    renderStylesheet(src: string): string;
+    renderStylesheet(req: R, src: string): string;
 
     /**
      * Renders inline style - only used in dev mode
      */
-    renderInlineStyle(style: string): string;
+    renderInlineStyle(req: R, style: string): string;
 }
 
 export type TemplatesOverrides = Partial<Templates>;
 
 export const DefaultTemplates: Templates = {
-    renderMain(params: MainTemplateParams): string {
+    renderMain(req: Request, params: MainTemplateParams): string {
         return `<!doctype html>
             <html lang="en-US">
               <head>
@@ -41,13 +42,13 @@ export const DefaultTemplates: Templates = {
               </body>
             </html>`
     },
-    renderScript(src: string): string {
+    renderScript(req: Request, src: string): string {
         return `<script src="${src}"></script>`
     },
-    renderStylesheet(src: string): string {
+    renderStylesheet(req: Request, src: string): string {
         return `<link rel="stylesheet" href="${src}" />`
     },
-    renderInlineStyle(style: string): string {
+    renderInlineStyle(req: Request, style: string): string {
         return `<style>${style}</style>`
     },
 }
