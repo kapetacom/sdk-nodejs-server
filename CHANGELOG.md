@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.1.2...v3.0.0) (2024-01-04)
+
+
+### Features
+
+* Include requests in templates ([#12](https://github.com/kapetacom/sdk-nodejs-server/issues/12)) ([497f58c](https://github.com/kapetacom/sdk-nodejs-server/commit/497f58cafaed3cbcb31f808198776f69b08885f5))
+
+
+### BREAKING CHANGES
+
+* Breaks compatibility with previous render methods
+
 ## [2.1.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.1.1...v2.1.2) (2024-01-04)
 
 
