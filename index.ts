@@ -51,7 +51,7 @@ export class Server {
 
         //Configure health endpoint as first route
         if (!this._options?.disableHealthCheck) {
-            this._configureHealthCheck();
+            this.configureHealthCheck();
         }
 
         this._express.set('json replacer', JSONStringifyReplacer);
@@ -60,11 +60,13 @@ export class Server {
 
     /**
      * Get access to the express app to make changes, add filters etc. directly
-     *
-     * @return {express}
      */
     public express() {
         return this._express;
+    }
+
+    public config() {
+        return this._config;
     }
 
     public use(...handlers: RequestHandler[]) {
@@ -89,7 +91,7 @@ export class Server {
         });
     }
 
-    private _configureErrorHandler() {
+    protected configureErrorHandler() {
         this._express.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
             const errorBody = err.message ? { error: err.message } : { error: 'Unknown error' };
             if (err.statusCode) {
@@ -101,20 +103,20 @@ export class Server {
         });
     }
 
-    private _configureCatchAll() {
+    protected configureCatchAll() {
         this._express.use((req, res) => {
             res.status(418).send({ error: 'Not available' });
         });
     }
 
-    private _configureHealthCheck() {
+    protected configureHealthCheck() {
         console.log('Configuring health check endpoint: %s', HEALTH_ENDPOINT);
         this._express.get(HEALTH_ENDPOINT, (req, res) => {
             res.status(200).send({ ok: true });
         });
     }
 
-    private async _start(portType: ServerPortType) {
+    protected async _start(portType: ServerPortType) {
         try {
 
             this._serverPort = parseInt(await this._config.getServerPort(portType));
@@ -137,11 +139,11 @@ export class Server {
         }
 
         if (!this._options?.disableErrorHandling) {
-            this._configureErrorHandler();
+            this.configureErrorHandler();
         }
 
         if (!this._options?.disableCatchAll) {
-            this._configureCatchAll();
+            this.configureCatchAll();
         }
 
         console.log('Starting server on %s:%s', this._serverHost, this._serverPort);
