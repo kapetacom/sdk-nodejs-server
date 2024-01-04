@@ -66,9 +66,9 @@ export const applyWebpackHandlers = (distFolder: string, devWebpackConfig: any, 
             const {assetsByChunkName, outputPath} = jsonWebpackStats;
             const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
 
-            res.send(templates.renderMain({
+            res.send(templates.renderMain(req, {
                 baseUrl,
-                styles: templates.renderInlineStyle(
+                styles: templates.renderInlineStyle(req,
                     allEntries(assetsByChunkName)
                     .filter((path) => path.endsWith(".css") && !path.endsWith(".hot-update.css"))
                     .map((path) => outputFileSystem.readFileSync(Path.join(outputPath, path)))
@@ -76,7 +76,7 @@ export const applyWebpackHandlers = (distFolder: string, devWebpackConfig: any, 
                 ),
                 scripts: allEntries(assetsByChunkName)
                     .filter((path) => path.endsWith(".js") && !path.endsWith(".hot-update.js"))
-                    .map((path) => templates.renderScript(path))
+                    .map((path) => templates.renderScript(req, path))
                     .join("\n")
             }));
         });
@@ -107,15 +107,15 @@ export const applyWebpackHandlers = (distFolder: string, devWebpackConfig: any, 
         app.get('/*', (req, res) => {
             const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
 
-            res.send(templates.renderMain({
+            res.send(templates.renderMain(req, {
                 baseUrl,
                 styles: allEntries(assets)
                     .filter((path) => path.endsWith(".css"))
-                    .map((path) => templates.renderStylesheet(path))
+                    .map((path) => templates.renderStylesheet(req,path))
                     .join("\n"),
                 scripts: allEntries(assets)
                     .filter((path) => path.endsWith(".js") && !path.endsWith(".hot-update.js"))
-                    .map((path) => templates.renderScript(path))
+                    .map((path) => templates.renderScript(req, path))
                     .join("\n")
 
             }));
