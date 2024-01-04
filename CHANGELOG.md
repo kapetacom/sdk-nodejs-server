@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.1.1...v2.1.2) (2024-01-04)
+
+
+### Bug Fixes
+
+* Make it possible to overwrite methods in Server ([#11](https://github.com/kapetacom/sdk-nodejs-server/issues/11)) ([09e194f](https://github.com/kapetacom/sdk-nodejs-server/commit/09e194f4486941db29ebf4c9d3462b15e6e9b0f6))
+
 ## [2.1.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.1.0...v2.1.1) (2023-12-29)
 
 
