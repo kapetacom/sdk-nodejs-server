@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.1.0...v3.1.1) (2024-01-05)
+
+
+### Bug Fixes
+
+* Include status code in response ([9604b88](https://github.com/kapetacom/sdk-nodejs-server/commit/9604b88411004314b7cd7470394d676b2d719b86))
+
 # [3.1.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.0.0...v3.1.0) (2024-01-05)
 
 
