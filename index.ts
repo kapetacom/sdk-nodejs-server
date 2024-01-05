@@ -4,9 +4,9 @@
  */
 
 import { ConfigProvider } from '@kapeta/sdk-config';
-import express, {Express, RequestHandler, Router} from 'express';
+import express, { Express, RequestHandler, Router } from 'express';
 import { applyWebpackHandlers } from './src/webpack';
-import {TemplatesOverrides} from "./src/templates";
+import { TemplatesOverrides } from './src/templates';
 const HEALTH_ENDPOINT = '/.kapeta/health';
 
 export * from './src/helpers';
@@ -16,7 +16,7 @@ export type ServerOptions = {
     disableErrorHandling?: boolean;
     disableCatchAll?: boolean;
     disableHealthCheck?: boolean;
-}
+};
 
 //We want dates as numbers
 const JSONStringifyReplacer = function (this: any, key: string, value: any) {
@@ -24,17 +24,15 @@ const JSONStringifyReplacer = function (this: any, key: string, value: any) {
         return this[key].getTime();
     }
     return value;
-}
+};
 
-export type ServerPortType = 'rest'|'web'|'http';
+export type ServerPortType = 'rest' | 'web' | 'http';
 
 export const isDevMode = () => {
-    return !!(process.env.NODE_ENV &&
-            process.env.NODE_ENV.toLowerCase() === "development");
-}
+    return !!(process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() === 'development');
+};
 
 export class Server {
-
     /**
      * Underlying express app
      */
@@ -55,7 +53,6 @@ export class Server {
         }
 
         this._express.set('json replacer', JSONStringifyReplacer);
-
     }
 
     /**
@@ -93,6 +90,10 @@ export class Server {
 
     protected configureErrorHandler() {
         this._express.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            if (res.headersSent) {
+                next(err);
+                return;
+            }
             const errorBody = err.message ? { error: err.message } : { error: 'Unknown error' };
             if (err.statusCode) {
                 res.status(err.statusCode).json(errorBody);
@@ -105,20 +106,21 @@ export class Server {
 
     protected configureCatchAll() {
         this._express.use((req, res) => {
-            res.status(418).send({ error: 'Not available' });
+            if (!res.headersSent) {
+                res.status(418).json({ error: 'Not available' });
+            }
         });
     }
 
     protected configureHealthCheck() {
         console.log('Configuring health check endpoint: %s', HEALTH_ENDPOINT);
         this._express.get(HEALTH_ENDPOINT, (req, res) => {
-            res.status(200).send({ ok: true });
+            res.status(200).json({ ok: true });
         });
     }
 
     protected async _start(portType: ServerPortType) {
         try {
-
             this._serverPort = parseInt(await this._config.getServerPort(portType));
             this._serverHost = await this._config.getServerHost();
         } catch (err: any) {
