@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.0.0...v3.1.0) (2024-01-05)
+
+
+### Features
+
+* Also adds response to templates ([c6bb5c0](https://github.com/kapetacom/sdk-nodejs-server/commit/c6bb5c079c2c67bf867ee5313b626f4654b84763))
+
 # [3.0.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v2.1.2...v3.0.0) (2024-01-04)
 
 
