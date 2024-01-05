@@ -77,6 +77,11 @@ export const applyWebpackHandlers = (
             const { assetsByChunkName, outputPath } = jsonWebpackStats;
             const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
 
+            if (res.locals?.error) {
+                const status = res.locals?.error?.statusCode ?? 500;
+                res.status(status);
+            }
+
             res.send(
                 templates.renderMain(req, res, {
                     baseUrl,
@@ -121,6 +126,11 @@ export const applyWebpackHandlers = (
 
         app.get('/*', (req, res) => {
             const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
+
+            if (res.locals?.error) {
+                const status = res.locals?.error?.statusCode ?? 500;
+                res.status(status);
+            }
 
             res.send(
                 templates.renderMain(req, res, {
