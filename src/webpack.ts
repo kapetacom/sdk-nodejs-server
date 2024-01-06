@@ -60,6 +60,12 @@ export const applyWebpackHandlers = (
         const webpackDevMiddleware = require('webpack-dev-middleware');
         const compiler = webpack(devWebpackConfig);
 
+        app.get('/favicon.ico', (req, res) => {
+            // If no favicon is found here, return 404
+            // This is to avoid the webpack dev middleware to return the index.html and taking a long time to respond
+            res.sendStatus(404).end();
+        });
+
         app.use(
             '/',
             webpackDevMiddleware(compiler, {
