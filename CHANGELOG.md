@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.1.1...v3.1.2) (2024-01-06)
+
+
+### Bug Fixes
+
+* Add handler for favicon - causes slow response times ([#13](https://github.com/kapetacom/sdk-nodejs-server/issues/13)) ([07aff4e](https://github.com/kapetacom/sdk-nodejs-server/commit/07aff4e52562e050695739adb233d65ae709ded6))
+
 ## [3.1.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.1.0...v3.1.1) (2024-01-05)
 
 
