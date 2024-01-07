@@ -70,9 +70,29 @@ export class Server {
         this._express.use(...handlers);
     }
 
+    /**
+     * @See configureFrontend
+     *
+     * @deprecated Use configureFrontend instead
+     */
     public configureAssets(distFolder: string, webpackConfig: any, templateOverrides?: TemplatesOverrides) {
         applyWebpackHandlers(distFolder, webpackConfig, this._express, templateOverrides);
     }
+
+    /**
+     * Configures the routes for the frontend assets built by webpack
+     *
+     * In development mode, this will be using hot-reload and be served from memory
+     * In production mode, this will be served from the provided dist folder on disk
+     *
+     * @param distFolder The folder where the webpack build is located. Usually "./dist"
+     * @param webpackConfig The webpack dev config object. Usually require('../../webpack.development.config')
+     * @param templateOverrides Optional overrides for the templates used to render the main HTML pages
+     */
+    public configureFrontend(distFolder: string, webpackConfig: any, templateOverrides?: TemplatesOverrides) {
+        applyWebpackHandlers(distFolder, webpackConfig, this._express, templateOverrides);
+    }
+
 
     /**
      * Starts server
