@@ -29,12 +29,13 @@ export type TemplatesOverrides = Partial<Templates>;
 
 export const DefaultTemplates: Templates = {
     renderMain(req: Request, res: Response, params: MainTemplateParams): string {
-        return `<!doctype html>
+        return `<!DOCTYPE html>
             <html lang="en-US">
               <head>
                 <title></title>
                 <meta charset="utf-8" />
                 <base href="${params.baseUrl}" />
+                <link rel='shortcut icon' type="image/svg+xml" href='/assets/images/favicon.svg' />
                 ${params.styles}
               </head>
               <body>
