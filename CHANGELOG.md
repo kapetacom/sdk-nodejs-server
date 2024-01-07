@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.1.2...v3.2.0) (2024-01-07)
+
+
+### Features
+
+* Add documentation and favicon to default template ([#14](https://github.com/kapetacom/sdk-nodejs-server/issues/14)) ([077088d](https://github.com/kapetacom/sdk-nodejs-server/commit/077088d42e2dbbb30898beafb1b9e0d0ca79b7bf))
+
 ## [3.1.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.1.1...v3.1.2) (2024-01-06)
 
 
