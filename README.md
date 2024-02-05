@@ -19,36 +19,41 @@ See the ```Server.configureFrontend()``` method for details.
 The webpack server is implemented in [src/webpack.ts](src/webpack.ts).
 
 #### Templates
-You can provide your templates to the method which controls the HTML served for the frontend.
-
-To override the main HTML template, you can provide a function to the ```renderMain``` option.
-
-The function will be called with the request, response and the template parameters.
+The templates are managed via [express template engine](https://expressjs.com/en/guide/using-template-engines.html).
+In short, express needs to know where the views live, and which renderer to use.
 
 Make sure to include all parameters in the template, otherwise the block will not work as expected.
+
 ```typescript
-// The directory where the output of the build is stored
+// Set up webpack middleware and render methods
 const DIST_DIR = Path.resolve(__dirname, "../dist");
 const webpackConfig = require("../webpack.development.config");
-server.configureFrontend(DIST_DIR, webpackConfig, {
-    renderMain(req: Request, res: Response, params: MainTemplateParams): string {
-        return `<!DOCTYPE html>
-            <html lang="en-US">
-              <head>
-                <title>My site</title>
-                <meta charset="utf-8" />
-                <base href="${params.baseUrl}" />
-                <link rel='shortcut icon' type="image/svg+xml" href='/assets/images/favicon.svg' />
-                ${params.styles}
-              </head>
-              <body>
-                ${params.scripts}
-              </body>
-            </html>`;
-    }
+server.configureFrontend(DIST_DIR, webpackConfig);
+
+// Set up templating
+const hbs = createHandlebars({
+    extname: '.hbs',
+    defaultLayout: false,
+    helpers: {
+        // Recommended helper to serialize values in handlebars
+        toJSON: (obj: any) => JSON.stringify(obj),
+    },
+});
+server.express().engine('handlebars', hbs.engine);
+server.express().set('views', Path.resolve(__dirname, "../templates"));
+server.express().set('view engine', 'handlebars');
+
+server.get('/', async (req, res, next) => {
+    // render the main template e.g. templates/main.hbs
+    await server.renderPage('main');
 });
 ```
-The templates are implemented in [src/templates.ts](src/templates.ts).
+
+Template parameters include:
+
+- `baseURL` usually sets the HTML [base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) in the template
+- `scripts` is a list of `<script>` tags to load the app JS bundle.
+- `styles` is a list of `<style>` tags to load the app CSS bundle.
 
 ### Healthcheck
 The server provides a standard Kapeta healthcheck endpoint at `/.kapeta/health`.

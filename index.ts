@@ -93,7 +93,6 @@ export class Server {
         applyWebpackHandlers(distFolder, webpackConfig, this._express, templateOverrides);
     }
 
-
     /**
      * Starts server
      */
@@ -109,7 +108,7 @@ export class Server {
     }
 
     protected configureErrorHandler() {
-        this._express.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+        this._express.use(<express.ErrorRequestHandler>((err, _req, res, next) => {
             if (res.headersSent) {
                 next(err);
                 return;
@@ -121,11 +120,11 @@ export class Server {
             }
 
             res.status(500).json(errorBody);
-        });
+        }));
     }
 
     protected configureCatchAll() {
-        this._express.use((req, res) => {
+        this._express.use((_req, res) => {
             if (!res.headersSent) {
                 res.status(418).json({ error: 'Not available' });
             }
