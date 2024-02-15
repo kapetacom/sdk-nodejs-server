@@ -1,3 +1,16 @@
+# [4.0.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.2.0...v4.0.0) (2024-02-15)
+
+
+### Features
+
+* configureFrontend webpack pre-route middleware ([0d9d87e](https://github.com/kapetacom/sdk-nodejs-server/commit/0d9d87ef04074e10cdee590fd69844b4c51be992))
+
+
+### BREAKING CHANGES
+
+* Requires setup of express view engine and view directories, as well as
+migrating to res.renderPage instead of fallthrough / catch-all rendering.
+
 # [3.2.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.1.2...v3.2.0) (2024-01-07)
 
 
