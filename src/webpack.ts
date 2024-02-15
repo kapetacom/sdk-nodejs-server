@@ -3,30 +3,20 @@
  * SPDX-License-Identifier: MIT
  */
 
+/// <reference path="../express.d.ts" />
+
 import express, { Express, NextFunction, Request, Response } from 'express';
 import FS from 'fs';
 import * as Path from 'node:path';
 import { asTemplates, TemplatesOverrides } from './templates';
 import { isDevMode } from '../index';
 
-function normalizeAssets(assets: any) {
-    if (!Array.isArray(assets)) {
-        return Object.values(assets);
+const ensureArray = (value: string | string[]): string[] => {
+    if (Array.isArray(value)) {
+        return value;
     }
-
-    return Array.isArray(assets) ? assets : [assets];
-}
-
-function allEntries(assetsByChunkName: any): string[] {
-    const out: string[] = [];
-    Object.values(assetsByChunkName).forEach((assets) => {
-        const normalizedAssets = normalizeAssets(assets);
-        if (Array.isArray(normalizedAssets)) {
-            out.push(...normalizedAssets.filter((asset) => typeof asset === 'string'));
-        }
-    });
-    return out;
-}
+    return [value];
+};
 
 /**
  * Applies webpack handlers to the express app.
@@ -35,76 +25,61 @@ function allEntries(assetsByChunkName: any): string[] {
  * In prod mode, the frontend is served from the dist folder.
  *
  * @param distFolder The absolute path to the dist folder where the build artifacts are located.
- * @param devWebpackConfig The webpack config used in dev mode.
+ * @param webpackConfig The webpack config used in dev mode.
  * @param app The express app to apply the handlers to.
  * @param templateOverrides Optional overrides for the templates used when rendering the HTML page.
  */
 export const applyWebpackHandlers = (
     distFolder: string,
-    devWebpackConfig: any,
+    webpackConfig: any,
     app: Express,
     templateOverrides?: TemplatesOverrides
 ) => {
     const templates = asTemplates(templateOverrides || {});
 
-    // If we catch an error here we want to render it using React
-    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-        res.locals.error = err;
-        next();
-    });
-
+    // Set up the two different ways of getting the webpack assets, either devmode rendering,
+    // or by reading the manifest in production mode
     if (isDevMode()) {
-        /* eslint-disable */
+        /* eslint-disable @typescript-eslint/no-var-requires */
         console.log('Serving development version');
         const webpack = require('webpack');
         const webpackDevMiddleware = require('webpack-dev-middleware');
-        const compiler = webpack(devWebpackConfig);
-
-        app.get('/favicon.ico', (req, res) => {
-            // If no favicon is found here, return 404
-            // This is to avoid the webpack dev middleware to return the index.html and taking a long time to respond
-            res.sendStatus(404).end();
-        });
+        const compiler = webpack(webpackConfig);
 
         app.use(
-            '/',
             webpackDevMiddleware(compiler, {
-                publicPath: '',
                 serverSideRender: true,
             })
         );
 
         app.use(require('webpack-hot-middleware')(compiler));
 
-        app.get('/*', (req, res) => {
+        // expose asset info on the request to be picked up by renderPage
+        app.use((_req, res, next) => {
             const { devMiddleware } = res.locals.webpack;
-            const outputFileSystem = devMiddleware.outputFileSystem;
-            const jsonWebpackStats = devMiddleware.stats.toJson();
-            const { assetsByChunkName, outputPath } = jsonWebpackStats;
-            const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
+            // Extract just the fields we need, since the webpack stats object is huge
+            const { entrypoints, publicPath } = devMiddleware.stats.toJson({
+                all: false,
+                entrypoints: true,
+                publicPath: true,
+            }) as { entrypoints: { [key: string]: { assets: { name: string }[] } }; publicPath: string };
 
-            if (res.locals?.error) {
-                const status = res.locals?.error?.statusCode ?? 500;
-                res.status(status);
-            }
+            const assets = Object.keys(entrypoints).reduce((agg, pageName) => {
+                const entryAssets = entrypoints[pageName].assets;
 
-            res.send(
-                templates.renderMain(req, res, {
-                    baseUrl,
-                    styles: templates.renderInlineStyle(
-                        req,
-                        res,
-                        allEntries(assetsByChunkName)
-                            .filter((path) => path.endsWith('.css') && !path.endsWith('.hot-update.css'))
-                            .map((path) => outputFileSystem.readFileSync(Path.join(outputPath, path)))
-                            .join('\n')
-                    ),
-                    scripts: allEntries(assetsByChunkName)
-                        .filter((path) => path.endsWith('.js') && !path.endsWith('.hot-update.js'))
-                        .map((path) => templates.renderScript(req, res, path))
-                        .join('\n'),
-                })
-            );
+                agg[pageName] = {
+                    js: entryAssets
+                        .filter((chunk) => chunk.name.endsWith('.js'))
+                        .map((chunk) => `${publicPath}${chunk.name}`),
+                    css: entryAssets
+                        .filter((chunk) => chunk.name.endsWith('.css'))
+                        .map((chunk) => `${publicPath}${chunk.name}`),
+                };
+                return agg;
+            }, {} as { [key: string]: { js: string[]; css: string[] } });
+
+            res.locals.webpackAssets = assets;
+            next();
         });
 
         /* eslint-enable */
@@ -117,7 +92,6 @@ export const applyWebpackHandlers = (
             );
             process.exit(1);
         }
-
         const assetsDataFile = Path.join(distFolder, 'assets.json');
         if (!FS.existsSync(assetsDataFile)) {
             console.error(
@@ -126,31 +100,67 @@ export const applyWebpackHandlers = (
             );
             process.exit(1);
         }
+        app.use(
+            webpackConfig.output.publicPath || '/',
+            express.static(distFolder, {
+                index: false,
+                immutable: true,
+                maxAge: 60 * 60 * 24 * 365 * 1000,
+                // Treat not found as a 404
+                fallthrough: false,
+            })
+        );
 
-        const assets = JSON.parse(FS.readFileSync(assetsDataFile).toString());
-        app.use(express.static(distFolder));
-
-        app.get('/*', (req, res) => {
-            const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
-
-            if (res.locals?.error) {
-                const status = res.locals?.error?.statusCode ?? 500;
-                res.status(status);
-            }
-
-            res.send(
-                templates.renderMain(req, res, {
-                    baseUrl,
-                    styles: allEntries(assets)
-                        .filter((path) => path.endsWith('.css'))
-                        .map((path) => templates.renderStylesheet(req, res, path))
-                        .join('\n'),
-                    scripts: allEntries(assets)
-                        .filter((path) => path.endsWith('.js') && !path.endsWith('.hot-update.js'))
-                        .map((path) => templates.renderScript(req, res, path))
-                        .join('\n'),
-                })
-            );
+        // expose asset info on the request to be picked up by renderPage
+        const assets = JSON.parse(FS.readFileSync(assetsDataFile, 'utf-8'));
+        app.use((_req, res, next) => {
+            res.locals.webpackAssets = assets;
+            next();
         });
     }
+
+    app.use((req, res, next) => {
+        // Method to pass templateProps to the render method, without rendering immediately
+        function setRenderValue(obj: { [key: string]: any }): void;
+        function setRenderValue(key: string, value: any): void;
+        function setRenderValue(key: string | { [key: string]: any }, value?: any): void {
+            res.locals.templateProps = res.locals.templateProps || {};
+            if (typeof key === 'object') {
+                Object.entries(key).forEach(([keyX, valueX]) => res.setRenderValue(keyX, valueX));
+            } else if (typeof key === 'string') {
+                res.locals.templateProps[key] = value;
+            }
+        }
+        res.setRenderValue = setRenderValue;
+
+        // TODO: idea; viewName could be a kapeta page
+        res.renderPage = (pageName: string, options: any) => {
+            // const publicPath = webpackConfig.output.publicPath as string;
+            const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
+            // const basePath = publicPath.endsWith('/') ? publicPath : publicPath + '/';
+
+            const webpackAssets: { [key: string]: { js: string | string[]; css: string | string[] } } =
+                res.locals.webpackAssets;
+
+            if (!(pageName in res.locals.webpackAssets)) {
+                // TODO: nicer error to point to the kapeta pages
+                throw new Error('Invalid page render, page not found in asset map');
+            }
+
+            res.render(options?.viewName || pageName, {
+                ...res.locals.templateProps,
+                ...options,
+                baseUrl,
+                styles: ensureArray(webpackAssets[pageName].css)
+                    .filter((path) => !path.endsWith('.hot-update.css'))
+                    .map((path) => templates.renderStylesheet(req, res, path))
+                    .join('\n'),
+                scripts: ensureArray(webpackAssets[pageName].js)
+                    .filter((path) => !path.endsWith('.hot-update.js'))
+                    .map((path) => templates.renderScript(req, res, path))
+                    .join('\n'),
+            });
+        };
+        next();
+    });
 };
