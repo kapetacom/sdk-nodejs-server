@@ -40,7 +40,7 @@ export const applyWebpackHandlers = (
     // Set up the two different ways of getting the webpack assets, either devmode rendering,
     // or by reading the manifest in production mode
     if (isDevMode()) {
-        /* eslint-disable */
+        /* eslint-disable @typescript-eslint/no-var-requires */
         console.log('Serving development version');
         const webpack = require('webpack');
         const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -57,14 +57,15 @@ export const applyWebpackHandlers = (
         // expose asset info on the request to be picked up by renderPage
         app.use((_req, res, next) => {
             const { devMiddleware } = res.locals.webpack;
+            // Extract just the fields we need, since the webpack stats object is huge
             const { entrypoints, publicPath } = devMiddleware.stats.toJson({
                 all: false,
                 entrypoints: true,
                 publicPath: true,
-            });
+            }) as { entrypoints: { [key: string]: { assets: { name: string }[] } }; publicPath: string };
 
             const assets = Object.keys(entrypoints).reduce((agg, pageName) => {
-                const entryAssets: { name: string }[] = entrypoints[pageName].assets;
+                const entryAssets = entrypoints[pageName].assets;
 
                 agg[pageName] = {
                     js: entryAssets
@@ -101,7 +102,13 @@ export const applyWebpackHandlers = (
         }
         app.use(
             webpackConfig.output.publicPath || '/',
-            express.static(distFolder, { index: false, immutable: true, maxAge: 60 * 60 * 24 * 365 * 1000 })
+            express.static(distFolder, {
+                index: false,
+                immutable: true,
+                maxAge: 60 * 60 * 24 * 365 * 1000,
+                // Treat not found as a 404
+                fallthrough: false,
+            })
         );
 
         // expose asset info on the request to be picked up by renderPage
