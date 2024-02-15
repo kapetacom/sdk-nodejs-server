@@ -45,7 +45,7 @@ server.express().set('view engine', 'handlebars');
 
 server.get('/', async (req, res, next) => {
     // render the main template e.g. templates/main.hbs
-    await server.renderPage('main');
+    await res.renderPage('main');
 });
 ```
 
