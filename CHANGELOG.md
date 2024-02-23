@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.0...v4.0.1) (2024-02-23)
+
+
+### Bug Fixes
+
+* export express/webpack method types ([#16](https://github.com/kapetacom/sdk-nodejs-server/issues/16)) ([d7578f1](https://github.com/kapetacom/sdk-nodejs-server/commit/d7578f1c2b2ed2f7fdc8bf5c3163669fb3167755))
+
 # [4.0.0](https://github.com/kapetacom/sdk-nodejs-server/compare/v3.2.0...v4.0.0) (2024-02-15)
 
 
