@@ -28,6 +28,7 @@ const ensureArray = (value: string | string[]): string[] => {
  * @param webpackConfig The webpack config used in dev mode.
  * @param app The express app to apply the handlers to.
  * @param templateOverrides Optional overrides for the templates used when rendering the HTML page.
+ * @internal
  */
 export const applyWebpackHandlers = (
     distFolder: string,

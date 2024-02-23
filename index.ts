@@ -11,6 +11,7 @@ const HEALTH_ENDPOINT = '/.kapeta/health';
 
 export * from './src/helpers';
 export * from './src/templates';
+export type * from './src/webpack';
 
 export type ServerOptions = {
     disableErrorHandling?: boolean;
