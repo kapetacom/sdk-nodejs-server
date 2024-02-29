@@ -101,18 +101,6 @@ export const applyWebpackHandlers = (
             );
             process.exit(1);
         }
-        const distPath = webpackConfig.output.publicPath || '/';
-        app.use(
-            distPath,
-            express.static(distFolder, {
-                index: false,
-                immutable: true,
-                maxAge: 60 * 60 * 24 * 365 * 1000,
-                // Treat not found as a 404, unless we're serving from the root,
-                // in which case we want to fall through to the rest of the routes
-                fallthrough: distPath !== '/',
-            })
-        );
 
         // expose asset info on the request to be picked up by renderPage
         const assets = JSON.parse(FS.readFileSync(assetsDataFile, 'utf-8'));
@@ -166,4 +154,17 @@ export const applyWebpackHandlers = (
         };
         next();
     });
+
+    const distPath = webpackConfig.output.publicPath || '/';
+    app.use(
+        distPath,
+        express.static(distFolder, {
+            index: false,
+            immutable: true,
+            maxAge: 60 * 60 * 24 * 365 * 1000,
+            // Treat not found as a 404, unless we're serving from the root,
+            // in which case we want to fall through to the rest of the routes
+            fallthrough: distPath !== '/',
+        })
+    );
 };
