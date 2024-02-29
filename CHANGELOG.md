@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.1...v4.0.2) (2024-02-29)
+
+
+### Bug Fixes
+
+* ensure relative paths for assets and guard against root dist path ([#17](https://github.com/kapetacom/sdk-nodejs-server/issues/17)) ([108bbee](https://github.com/kapetacom/sdk-nodejs-server/commit/108bbeef117c9ef1e4d0540046d5c22bcb4176fd))
+
 ## [4.0.1](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.0...v4.0.1) (2024-02-23)
 
 
