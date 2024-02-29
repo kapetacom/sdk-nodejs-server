@@ -101,16 +101,6 @@ export const applyWebpackHandlers = (
             );
             process.exit(1);
         }
-        app.use(
-            webpackConfig.output.publicPath || '/',
-            express.static(distFolder, {
-                index: false,
-                immutable: true,
-                maxAge: 60 * 60 * 24 * 365 * 1000,
-                // Treat not found as a 404
-                fallthrough: false,
-            })
-        );
 
         // expose asset info on the request to be picked up by renderPage
         const assets = JSON.parse(FS.readFileSync(assetsDataFile, 'utf-8'));
@@ -154,14 +144,27 @@ export const applyWebpackHandlers = (
                 baseUrl,
                 styles: ensureArray(webpackAssets[pageName].css)
                     .filter((path) => !path.endsWith('.hot-update.css'))
-                    .map((path) => templates.renderStylesheet(req, res, path))
+                    .map((path) => templates.renderStylesheet(req, res, path.replace(/^\//, '')))
                     .join('\n'),
                 scripts: ensureArray(webpackAssets[pageName].js)
                     .filter((path) => !path.endsWith('.hot-update.js'))
-                    .map((path) => templates.renderScript(req, res, path))
+                    .map((path) => templates.renderScript(req, res, path.replace(/^\//, '')))
                     .join('\n'),
             });
         };
         next();
     });
+
+    const distPath = webpackConfig.output.publicPath || '/';
+    app.use(
+        distPath,
+        express.static(distFolder, {
+            index: false,
+            immutable: true,
+            maxAge: 60 * 60 * 24 * 365 * 1000,
+            // Treat not found as a 404, unless we're serving from the root,
+            // in which case we want to fall through to the rest of the routes
+            fallthrough: distPath !== '/',
+        })
+    );
 };
