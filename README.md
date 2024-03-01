@@ -39,9 +39,9 @@ const hbs = createHandlebars({
         toJSON: (obj: any) => JSON.stringify(obj),
     },
 });
-server.express().engine('handlebars', hbs.engine);
+server.express().engine('hbs', hbs.engine);
 server.express().set('views', Path.resolve(__dirname, "../templates"));
-server.express().set('view engine', 'handlebars');
+server.express().set('view engine', 'hbs');
 
 server.get('/', async (req, res, next) => {
     // render the main template e.g. templates/main.hbs
