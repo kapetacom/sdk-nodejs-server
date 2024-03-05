@@ -1,3 +1,10 @@
+## [4.0.4](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.3...v4.0.4) (2024-03-05)
+
+
+### Bug Fixes
+
+* add validation for publicPath trailing slash ([5e1f97e](https://github.com/kapetacom/sdk-nodejs-server/commit/5e1f97e43671296599032adabb292b429b1ca7a0))
+
 ## [4.0.3](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.2...v4.0.3) (2024-03-05)
 
 
