@@ -38,9 +38,14 @@ export const applyWebpackHandlers = (
 ) => {
     const templates = asTemplates(templateOverrides || {});
 
-    const distPath: string = webpackConfig.output.publicPath?.replace(/[/]$/g, '') || 'dist';
+    const distPath: string = webpackConfig.output.publicPath || 'dist/';
     if (distPath && distPath.startsWith('/')) {
         throw new Error('The publicPath in the webpack config must be a relative path to work with fragments');
+    }
+    if (!distPath.endsWith('/')) {
+        throw new Error(
+            'The publicPath in the webpack config should end with a trailing slash to work properly w/ assets'
+        );
     }
 
     // Set up the two different ways of getting the webpack assets, either devmode rendering,
@@ -76,10 +81,10 @@ export const applyWebpackHandlers = (
                 agg[pageName] = {
                     js: entryAssets
                         .filter((chunk) => chunk.name.endsWith('.js'))
-                        .map((chunk) => `${distPath}/${chunk.name}`),
+                        .map((chunk) => `${distPath}${chunk.name}`),
                     css: entryAssets
                         .filter((chunk) => chunk.name.endsWith('.css'))
-                        .map((chunk) => `${distPath}/${chunk.name}`),
+                        .map((chunk) => `${distPath}${chunk.name}`),
                 };
                 return agg;
             }, {} as { [key: string]: { js: string[]; css: string[] } });
@@ -148,12 +153,12 @@ export const applyWebpackHandlers = (
                 styles: ensureArray(webpackAssets[pageName].css)
                     .filter((path) => !path.endsWith('.hot-update.css'))
                     // Replace the auto/ prefix (webpack default) with the dist path
-                    .map((path) => templates.renderStylesheet(req, res, path.replace(/^auto\//, `${distPath}/`)))
+                    .map((path) => templates.renderStylesheet(req, res, path.replace(/^auto\//, `${distPath}`)))
                     .join('\n'),
                 scripts: ensureArray(webpackAssets[pageName].js)
                     .filter((path) => !path.endsWith('.hot-update.js'))
                     // Replace the auto/ prefix (webpack default) with the dist path
-                    .map((path) => templates.renderScript(req, res, path.replace(/^auto\//, `${distPath}/`)))
+                    .map((path) => templates.renderScript(req, res, path.replace(/^auto\//, `${distPath}`)))
                     .join('\n'),
             });
         };
