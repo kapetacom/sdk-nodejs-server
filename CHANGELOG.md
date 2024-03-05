@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.2...v4.0.3) (2024-03-05)
+
+
+### Bug Fixes
+
+* publicPath should always be relative to work w/ fragments ([#18](https://github.com/kapetacom/sdk-nodejs-server/issues/18)) ([96d53ec](https://github.com/kapetacom/sdk-nodejs-server/commit/96d53ecb74ec87641f042a502ec85e12e921b952))
+
 ## [4.0.2](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.1...v4.0.2) (2024-02-29)
 
 
