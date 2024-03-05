@@ -38,6 +38,11 @@ export const applyWebpackHandlers = (
 ) => {
     const templates = asTemplates(templateOverrides || {});
 
+    const distPath: string = webpackConfig.output.publicPath?.replace(/[/]$/g, '') || 'dist';
+    if (distPath && distPath.startsWith('/')) {
+        throw new Error('The publicPath in the webpack config must be a relative path to work with fragments');
+    }
+
     // Set up the two different ways of getting the webpack assets, either devmode rendering,
     // or by reading the manifest in production mode
     if (isDevMode()) {
@@ -50,6 +55,7 @@ export const applyWebpackHandlers = (
         app.use(
             webpackDevMiddleware(compiler, {
                 serverSideRender: true,
+                publicPath: distPath,
             })
         );
 
@@ -59,11 +65,10 @@ export const applyWebpackHandlers = (
         app.use((_req, res, next) => {
             const { devMiddleware } = res.locals.webpack;
             // Extract just the fields we need, since the webpack stats object is huge
-            const { entrypoints, publicPath } = devMiddleware.stats.toJson({
+            const { entrypoints } = devMiddleware.stats.toJson({
                 all: false,
                 entrypoints: true,
-                publicPath: true,
-            }) as { entrypoints: { [key: string]: { assets: { name: string }[] } }; publicPath: string };
+            }) as { entrypoints: { [key: string]: { assets: { name: string }[] } } };
 
             const assets = Object.keys(entrypoints).reduce((agg, pageName) => {
                 const entryAssets = entrypoints[pageName].assets;
@@ -71,10 +76,10 @@ export const applyWebpackHandlers = (
                 agg[pageName] = {
                     js: entryAssets
                         .filter((chunk) => chunk.name.endsWith('.js'))
-                        .map((chunk) => `${publicPath}${chunk.name}`),
+                        .map((chunk) => `${distPath}/${chunk.name}`),
                     css: entryAssets
                         .filter((chunk) => chunk.name.endsWith('.css'))
-                        .map((chunk) => `${publicPath}${chunk.name}`),
+                        .map((chunk) => `${distPath}/${chunk.name}`),
                 };
                 return agg;
             }, {} as { [key: string]: { js: string[]; css: string[] } });
@@ -126,9 +131,7 @@ export const applyWebpackHandlers = (
 
         // TODO: idea; viewName could be a kapeta page
         res.renderPage = (pageName: string, options: any) => {
-            // const publicPath = webpackConfig.output.publicPath as string;
             const baseUrl = (req.query._kap_basepath ? req.query._kap_basepath : '/').toString();
-            // const basePath = publicPath.endsWith('/') ? publicPath : publicPath + '/';
 
             const webpackAssets: { [key: string]: { js: string | string[]; css: string | string[] } } =
                 res.locals.webpackAssets;
@@ -144,27 +147,26 @@ export const applyWebpackHandlers = (
                 baseUrl,
                 styles: ensureArray(webpackAssets[pageName].css)
                     .filter((path) => !path.endsWith('.hot-update.css'))
-                    .map((path) => templates.renderStylesheet(req, res, path.replace(/^\//, '')))
+                    // Replace the auto/ prefix (webpack default) with the dist path
+                    .map((path) => templates.renderStylesheet(req, res, path.replace(/^auto\//, `${distPath}/`)))
                     .join('\n'),
                 scripts: ensureArray(webpackAssets[pageName].js)
                     .filter((path) => !path.endsWith('.hot-update.js'))
-                    .map((path) => templates.renderScript(req, res, path.replace(/^\//, '')))
+                    // Replace the auto/ prefix (webpack default) with the dist path
+                    .map((path) => templates.renderScript(req, res, path.replace(/^auto\//, `${distPath}/`)))
                     .join('\n'),
             });
         };
         next();
     });
 
-    const distPath = webpackConfig.output.publicPath || '/';
     app.use(
-        distPath,
+        `/${distPath}`,
         express.static(distFolder, {
             index: false,
             immutable: true,
             maxAge: 60 * 60 * 24 * 365 * 1000,
-            // Treat not found as a 404, unless we're serving from the root,
-            // in which case we want to fall through to the rest of the routes
-            fallthrough: distPath !== '/',
+            fallthrough: false,
         })
     );
 };
