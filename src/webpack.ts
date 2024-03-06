@@ -60,7 +60,7 @@ export const applyWebpackHandlers = (
         app.use(
             webpackDevMiddleware(compiler, {
                 serverSideRender: true,
-                publicPath: distPath,
+                publicPath: '/' + distPath,
             })
         );
 
