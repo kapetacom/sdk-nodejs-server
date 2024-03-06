@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.4...v4.0.5) (2024-03-06)
+
+
+### Bug Fixes
+
+* dev middleware publicPath needs to start w/ slash ([af8321d](https://github.com/kapetacom/sdk-nodejs-server/commit/af8321d34fb4c83f412bc1152402adaaa91cc8a7))
+
 ## [4.0.4](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.3...v4.0.4) (2024-03-05)
 
 
