@@ -1,3 +1,10 @@
+## [4.0.6](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.5...v4.0.6) (2024-07-15)
+
+
+### Bug Fixes
+
+* handle empty style/css assets ([668bf50](https://github.com/kapetacom/sdk-nodejs-server/commit/668bf50ea183057c4cb0e23e2c74d70882b69879))
+
 ## [4.0.5](https://github.com/kapetacom/sdk-nodejs-server/compare/v4.0.4...v4.0.5) (2024-03-06)
 
 
