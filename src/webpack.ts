@@ -15,7 +15,7 @@ const ensureArray = (value: string | string[]): string[] => {
     if (Array.isArray(value)) {
         return value;
     }
-    return [value];
+    return [value].filter(Boolean);
 };
 
 /**
